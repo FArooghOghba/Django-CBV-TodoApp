@@ -8,6 +8,10 @@ from .forms import TaskForm
 # Create your views here.
 
 class TaskListView(ListView):
+    """
+    Render some Task list of objects, set by `self.model`.
+    """
+
     model = Task
     context_object_name = 'tasks'
 
