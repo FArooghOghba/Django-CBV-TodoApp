@@ -1,5 +1,7 @@
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView
+
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView, UpdateView
 
 from .models import Task
 from .forms import TaskForm
@@ -29,3 +31,15 @@ class TaskCreateView(CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super(TaskCreateView, self).form_valid(form)
+
+
+class TaskUpdateView(UpdateView):
+    """
+    View for updating a task object, with a response
+    rendered by a template.
+    """
+
+    model = Task
+    form_class = TaskForm
+    pk_url_kwarg = 'task_id'
+    success_url = reverse_lazy('task:list')
