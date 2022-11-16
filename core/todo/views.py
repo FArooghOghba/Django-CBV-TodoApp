@@ -1,4 +1,5 @@
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -9,7 +10,7 @@ from .forms import TaskForm
 
 # Create your views here.
 
-class TaskListView(ListView):
+class TaskListView(LoginRequiredMixin, ListView):
     """
     Render some Task list of objects, set by `self.model`.
     """
@@ -23,7 +24,7 @@ class TaskListView(ListView):
         return context
 
 
-class TaskCreateView(CreateView):
+class TaskCreateView(LoginRequiredMixin, CreateView):
     """
     View for creating a new Task object, with a response
     rendered by a template.
@@ -38,7 +39,7 @@ class TaskCreateView(CreateView):
         return super(TaskCreateView, self).form_valid(form)
 
 
-class TaskUpdateView(UpdateView):
+class TaskUpdateView(LoginRequiredMixin, UpdateView):
     """
     View for updating a task object, with a response
     rendered by a template.
@@ -50,7 +51,7 @@ class TaskUpdateView(UpdateView):
     success_url = reverse_lazy('task:list')
 
 
-class TaskDeleteView(DeleteView):
+class TaskDeleteView(LoginRequiredMixin, DeleteView):
     """
     View for deleting a task object retrieved with self.get_object(), with a
     response rendered by a template.
