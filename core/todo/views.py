@@ -1,7 +1,9 @@
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from .models import Task
@@ -22,6 +24,29 @@ class TaskListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['tasks'] = self.model.objects.filter(user=self.request.user)
         return context
+
+
+class TaskDetailView(LoginRequiredMixin, DetailView):
+    """
+    Render a "detail" view of a task object.
+
+    By default, this is a model instance looked up from `self.queryset`, but the
+    view will support display of *any* object by overriding `self.get_object()`.
+    """
+
+    model = Task
+    context_object_name = 'task'
+    pk_url_kwarg = 'task_id'
+
+    def get_queryset(self):
+        """
+        Return the `QuerySet` that will be used to look up the object.
+        This method is called by the default implementation of get_object() and
+        may not be called if function get_object() is overridden.
+        :return: user task
+        """
+
+        return self.model.objects.filter(user=self.request.user)
 
 
 class TaskCreateView(LoginRequiredMixin, CreateView):
