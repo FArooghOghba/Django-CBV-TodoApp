@@ -75,6 +75,16 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
     pk_url_kwarg = 'task_id'
     success_url = reverse_lazy('task:list')
 
+    def get_queryset(self):
+        """
+        Return the `QuerySet` that will be used to look up the object.
+        This method is called by the default implementation of get_object() and
+        may not be called if function get_object() is overridden.
+        :return: user task
+        """
+
+        return self.model.objects.filter(user=self.request.user)
+
 
 class TaskDeleteView(LoginRequiredMixin, DeleteView):
     """
@@ -86,3 +96,14 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
     pk_url_kwarg = 'task_id'
     context_object_name = 'task'
     success_url = reverse_lazy('task:list')
+
+    def get_queryset(self):
+        """
+        Return the `QuerySet` that will be used to look up the object.
+        This method is called by the default implementation of get_object() and
+        may not be called if function get_object() is overridden.
+        :return: user task
+        """
+
+        return self.model.objects.filter(user=self.request.user)
+
