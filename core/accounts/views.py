@@ -1,5 +1,5 @@
 from django.urls import reverse_lazy
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 
 
 # Create your views here.
@@ -11,3 +11,7 @@ class CustomLoginView(LoginView):
 
     def get_success_url(self):
         return reverse_lazy('task:list')
+
+
+class AccountsLogoutView(LogoutView):
+    next_page = reverse_lazy('accounts:login')
