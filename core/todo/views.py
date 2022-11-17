@@ -24,6 +24,7 @@ class TaskListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tasks'] = self.model.objects.filter(user=self.request.user)
+        context['incomplete_task_count'] = context['tasks'].filter(complete=False).count()
         return context
 
 
