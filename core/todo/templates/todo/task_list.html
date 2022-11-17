@@ -16,11 +16,13 @@
     </div>
 
     <div id="search-add-wrapper">
-        <form method="GET" style="margin-top: 20px; display: flex;">
+        <form method="GET" style="margin: 10px; display: flex;">
             <input type="text" name="search_input" value="">
             <input class="button" type="submit" value="Search">
         </form>
-        <a id="add-link" href="{% url 'task:create' %}">&#x2b;</a>
+        <a id="add-link" href="{% url 'task:create' %}">
+            <iconify-icon icon="carbon:intent-request-create"></iconify-icon>
+        </a>
     </div>
 
     <div class="task-items-wrapper">
@@ -38,7 +40,15 @@
                 </div>
             {% endif %}
 
-            <a class="delete-link" href="{% url 'task:delete' task_id=task.id %}">&#215;</a>
+            <div>
+                <a class="edite-link" href="">
+                    <iconify-icon icon="material-symbols:edit-outline"></iconify-icon>
+                </a>
+
+                <a class="delete-link" href="{% url 'task:delete' task_id=task.id %}">
+                    <iconify-icon icon="material-symbols:delete-outline-rounded"></iconify-icon>
+                </a>
+            </div>
 
         </div>
         {% empty %}
