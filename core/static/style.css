@@ -63,14 +63,14 @@ p {
 .task-complete-icon {
     height: 20px;
     width: 20px;
-    background-color: rgb(105, 192, 105);
+    color: rgb(105, 192, 105);
     border-radius: 50%;
 }
 
 .task-incomplete-icon {
     height: 20px;
     width: 20px;
-    background-color: rgb(218, 218, 218);
+    color: rgb(218, 218, 218);
     border-radius: 50%;
 }
 
@@ -98,6 +98,8 @@ p {
 }
 
 #add-link {
+    margin-top: 5px;
+    margin-right: 20px;
     color: #cf4949;
     text-decoration: none;
     font-size: 30px;

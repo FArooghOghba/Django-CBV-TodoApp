@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from django.views import View
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -107,3 +108,14 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
 
         return self.model.objects.filter(user=self.request.user)
 
+
+class TaskCompleteView(View):
+    model = Task
+    pk_url_kwarg = 'task_id'
+    success_url = reverse_lazy('task:list')
+
+    def get(self, request, *args, **kwargs):
+        task = Task.objects.get(id=kwargs.get('task_id'))
+        task.complete = True
+        task.save()
+        return redirect('task:list')

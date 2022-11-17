@@ -30,13 +30,21 @@
         <div class="task-wrapper">
             {% if task.complete %}
                 <div class="task-title">
-                    <div class="task-complete-icon"></div>
+                    <div class="task-complete-icon">
+                        <iconify-icon icon="fluent-mdl2:completed-solid" width="22" height="22"></iconify-icon>
+                    </div>
                     <i><s><a href="{% url 'task:update' task_id=task.id %}">{{ task }}</a></s></i>
                 </div>
             {% else %}
                 <div class="task-title">
-                    <div class="task-incomplete-icon"></div>
-                    <a href="{% url 'task:update' task.id %}">{{ task }}</a>
+                    <a href="{% url 'task:complete' task_id=task.id %}" style="margin-left: 0;">
+                        <div class="task-incomplete-icon">
+                            <iconify-icon icon="fluent-mdl2:completed-solid" width="22" height="22"></iconify-icon>
+                        </div>
+                    </a>
+                    <a href="{% url 'task:update' task.id %}">
+                        {{ task }}
+                    </a>
                 </div>
             {% endif %}
 
