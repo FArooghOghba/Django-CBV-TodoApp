@@ -45,6 +45,10 @@ class AccountsRegisterFormView(FormView):
 
 
 class AccountsLoginView(LoginView):
+    """
+    Display the login form and handle the login action.
+    """
+
     template_name = 'accounts/login.html'
     fields = ('email', 'password')
     redirect_authenticated_user = True
@@ -54,4 +58,8 @@ class AccountsLoginView(LoginView):
 
 
 class AccountsLogoutView(LogoutView):
+    """
+    Log out the user and display
+    the 'You are logged out' message.
+    """
     next_page = reverse_lazy('accounts:login')
