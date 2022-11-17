@@ -116,6 +116,11 @@ class TaskCompleteView(View):
 
     def get(self, request, *args, **kwargs):
         task = Task.objects.get(id=kwargs.get('task_id'))
-        task.complete = True
+
+        if task.complete:
+            task.complete = False
+        else:
+            task.complete = True
+
         task.save()
         return redirect('task:list')
