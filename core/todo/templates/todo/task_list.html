@@ -31,14 +31,15 @@
                     <div class="task-complete-icon"></div>
                     <i><s><a href="{% url 'task:update' task_id=task.id %}">{{ task }}</a></s></i>
                 </div>
-                <a class="delete-link" href="{% url 'task:delete' task_id=task.id %}">&#215;</a>
             {% else %}
                 <div class="task-title">
                     <div class="task-incomplete-icon"></div>
                     <a href="{% url 'task:update' task.id %}">{{ task }}</a>
                 </div>
-                <a class="delete-link" href="{% url 'task:delete' task.id %}">&#215;</a>
             {% endif %}
+
+            <a class="delete-link" href="{% url 'task:delete' task_id=task.id %}">&#215;</a>
+
         </div>
         {% empty %}
             <h3>No Item in List!</h3>

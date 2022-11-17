@@ -90,10 +90,10 @@ p {
 }
 
 #add-link {
-    color: #EB796F;
+    color: rgb(105, 192, 105);
     text-decoration: none;
     font-size: 42px;
-    text-shadow: 1px 1px #81413b;
+    text-shadow: 1px 1px #39FFA1;
 }
 
 input[type=email],
