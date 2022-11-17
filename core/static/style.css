@@ -36,6 +36,12 @@ p {
     background: linear-gradient(90deg, #EEA390 0%, #EB796F 43%, #EB796F 100%);
 }
 
+.empty-list {
+    display: flex;
+    justify-content: space-between;
+    padding: 25px;
+}
+
 .header-bar a {
     color: rgb(247, 247, 247);
     text-decoration: none;
