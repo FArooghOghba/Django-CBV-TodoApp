@@ -8,6 +8,7 @@
     <div class="card-body">
         <form method="POST">
             {% csrf_token %}
+            {{ form.errors }}
             <label>
                 {{ form.email.label }}
             </label>
