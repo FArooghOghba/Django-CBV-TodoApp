@@ -117,6 +117,11 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
 
 
 class TaskCompleteView(View):
+    """
+    View for checking a task object as complete and doesn't need to use
+    edit page.
+    """
+
     model = Task
     pk_url_kwarg = 'task_id'
     success_url = reverse_lazy('task:list')
