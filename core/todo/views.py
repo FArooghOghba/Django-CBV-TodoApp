@@ -25,6 +25,12 @@ class TaskListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['tasks'] = self.model.objects.filter(user=self.request.user)
         context['incomplete_task_count'] = context['tasks'].filter(complete=False).count()
+
+        search = self.request.GET.get('search', '')
+        if search:
+            context['tasks'] = context['tasks'].filter(title__icontains=search)
+        context['search'] = search
+
         return context
 
 
