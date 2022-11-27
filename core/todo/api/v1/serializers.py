@@ -1,6 +1,11 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 
 from todo.models import Task
+
+
+# Get user model
+user = get_user_model()
 
 
 class TaskModelSerializer(serializers.ModelSerializer):
@@ -27,9 +32,16 @@ class TaskModelSerializer(serializers.ModelSerializer):
 
         return rep
 
+    def create(self, validated_data):
+        request = self.context.get('request')
+        user_id = request.user.id
+        validated_data['user'] = user.objects.get(id=user_id)
+        return super(TaskModelSerializer, self).create(validated_data)
+
     class Meta:
         model = Task
         fields = (
             'id', 'user', 'title', 'snippet', 'absolute_url',
             'descriptions', 'complete', 'created_date'
         )
+        read_only_fields = ('user',)
