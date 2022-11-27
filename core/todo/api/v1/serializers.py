@@ -1,14 +1,35 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 
 from todo.models import Task
 
 
-class TaskModelSerializer(ModelSerializer):
+class TaskModelSerializer(serializers.ModelSerializer):
     """
     Task Serializer creates from ModelSerializer.
     """
+    snippet = serializers.ReadOnlyField(source='get_snippet')
+    absolute_url = serializers.SerializerMethodField(method_name='get_absolute_url')
+
+    def get_absolute_url(self, task_obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(task_obj.pk)
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        rep = super(TaskModelSerializer, self).to_representation(instance)
+
+        is_retrieve = request.parser_context.get('kwargs').get('pk')
+        if is_retrieve is not None:
+            rep.pop('snippet', None)
+            rep.pop('absolute_url', None)
+        else:
+            rep.pop('descriptions', None)
+
+        return rep
+
     class Meta:
         model = Task
         fields = (
-            'id', 'user', 'title', 'descriptions', 'complete', 'created_date'
+            'id', 'user', 'title', 'snippet', 'absolute_url',
+            'descriptions', 'complete', 'created_date'
         )

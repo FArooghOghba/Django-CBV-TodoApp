@@ -21,6 +21,9 @@ class Task(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
+    def get_snippet(self):
+        return f'{self.descriptions[:15]} ...'
+
     def __str__(self):
         return self.title
 
