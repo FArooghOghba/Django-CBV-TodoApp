@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (TaskListView, TaskCreateView, TaskUpdateView,
                     TaskDetailView, TaskDeleteView, TaskCompleteView)
 
@@ -13,4 +13,6 @@ urlpatterns = [
     path('task/<int:task_id>/update/', TaskUpdateView.as_view(), name='update'),
     path('task/<int:task_id>/complete/', TaskCompleteView.as_view(), name='complete'),
     path('task/<int:task_id>/delete/', TaskDeleteView.as_view(), name='delete'),
+
+    path('api/v1/', include('todo.api.v1.urls'))
 ]
