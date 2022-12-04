@@ -1,6 +1,12 @@
+# General Packages
 django >3.2,<3.3
-python-decouple
-django-debug-toolbar
 djangorestframework
-markdown
+
+# Third Party Packages
+drf-yasg[validation]
 django-filter
+python-decouple
+markdown
+
+# Development Packages
+django-debug-toolbar
