@@ -12,7 +12,7 @@ User = get_user_model()
 
 class LoginSerializer(serializers.Serializer):
     """
-    This serializer defines two fields for authentication:
+    This serializer defines two fields for "session authentication":
       * email
       * password.
     It will try to authenticate the user with when validated.

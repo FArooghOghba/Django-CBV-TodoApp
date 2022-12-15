@@ -34,7 +34,7 @@ class RegistrationGenericAPIView(GenericAPIView):
 
 class LoginGenericAPIView(GenericAPIView):
     """
-    Login view to get user credentials.
+    Login view to get user credentials with "session authentication".
     This view should be accessible also for unauthenticated users.
     """
     serializer_class = LoginSerializer

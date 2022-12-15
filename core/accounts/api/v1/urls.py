@@ -7,6 +7,9 @@ app_name = 'api-v1'
 
 
 urlpatterns = [
+    # Registration
     path('register/', RegistrationGenericAPIView.as_view(), name='register'),
-    path('login/', LoginGenericAPIView.as_view(), name='login'),
+
+    # Session Authentication
+    path('session/login/', LoginGenericAPIView.as_view(), name='login'),
 ]
