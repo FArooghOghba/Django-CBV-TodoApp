@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model, login, authenticate
+
 from rest_framework.generics import GenericAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -9,10 +11,11 @@ from rest_framework.status import (
     HTTP_401_UNAUTHORIZED, HTTP_204_NO_CONTENT
 )
 
-from django.contrib.auth import get_user_model, login, authenticate
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import (
-    LoginSerializer, RegistrationModelSerializer, CustomAuthTokenSerializer
+    LoginSerializer, RegistrationModelSerializer,
+    CustomAuthTokenSerializer, CustomTokenObtainSerializer
 )
 
 
@@ -89,3 +92,11 @@ class DiscardAuthTokenAPIView(APIView):
     def post(self, request):
         request.user.auth_token.delete()
         return Response(status=HTTP_204_NO_CONTENT)
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    create and get token pair view to get user credentials with "JWT".
+    This view should be accessible also for unauthenticated users.
+    """
+    serializer_class = CustomTokenObtainSerializer

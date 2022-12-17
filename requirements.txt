@@ -3,6 +3,7 @@ django >3.2,<3.3
 djangorestframework
 
 # Third Party Packages
+djangorestframework-simplejwt
 drf-yasg[validation]
 django-filter
 python-decouple

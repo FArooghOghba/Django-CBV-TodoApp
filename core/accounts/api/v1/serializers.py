@@ -1,10 +1,12 @@
-from rest_framework import serializers
-from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST
-
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.password_validation import validate_password
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+
+from rest_framework import serializers
+from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 User = get_user_model()
@@ -147,3 +149,23 @@ class CustomAuthTokenSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class CustomTokenObtainSerializer(TokenObtainPairSerializer):
+    """
+     This serializer adds three fields to validated data apart from
+      the pair of tokens "JWT authentication":
+      * user_id
+      * email
+      * username.
+    It will try to authenticate to give a pair of tokens to the user.
+    """
+
+    def validate(self, attrs):
+        validated_data = super().validate(attrs)
+
+        validated_data['user_id'] = self.user.id
+        validated_data['email'] = self.user.email
+        validated_data['username'] = self.user.username
+
+        return validated_data
