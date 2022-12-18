@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model, login, authenticate
+from django.contrib.auth import get_user_model, login
 
 from rest_framework.generics import GenericAPIView
 from rest_framework.views import APIView
@@ -8,15 +8,20 @@ from rest_framework.authtoken.views import ObtainAuthToken as BaseObtainAuthToke
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import (
     HTTP_201_CREATED, HTTP_202_ACCEPTED,
-    HTTP_401_UNAUTHORIZED, HTTP_204_NO_CONTENT
+    HTTP_401_UNAUTHORIZED, HTTP_204_NO_CONTENT,
+    HTTP_400_BAD_REQUEST
 )
 
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .serializers import (
     LoginSerializer, RegistrationModelSerializer,
-    CustomAuthTokenSerializer, CustomTokenObtainSerializer
+    CustomAuthTokenSerializer, CustomTokenObtainSerializer,
+    ChangePasswordSerializer
 )
+
+
+User = get_user_model()
 
 
 class RegistrationGenericAPIView(GenericAPIView):
@@ -33,7 +38,6 @@ class RegistrationGenericAPIView(GenericAPIView):
 
             email = serializer.validated_data['email']
             username = serializer.validated_data['username']
-            password = serializer.validated_data['password']
 
             data = {
                 'email': email,
@@ -42,6 +46,43 @@ class RegistrationGenericAPIView(GenericAPIView):
             return Response(data, status=HTTP_201_CREATED)
 
         return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+
+
+class ChangePasswordGenericAPIView(GenericAPIView):
+    """
+    Change Password view to get new password for user.
+    This view should be accessible for authenticated users.
+    """
+    model = User
+    permission_classes = (IsAuthenticated,)
+    serializer_class = ChangePasswordSerializer
+    def get_object(self):
+        user_obj = self.request.user
+        return user_obj
+
+    def put(self, request, *args, **kwargs):
+        user_obj = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            old_password = serializer.validated_data['old_password']
+            new_password = serializer.validated_data['new_password']
+
+            if not user_obj.check_password(old_password):
+                return Response(
+                    {'wrong password': 'Old password is not correct'},
+                    status=HTTP_400_BAD_REQUEST
+                )
+
+            user_obj.set_password(new_password)
+            user_obj.save()
+            return Response(
+                {'new_password': 'Password changed successfully.'},
+                status=HTTP_202_ACCEPTED
+            )
+
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
 
 
 class LoginGenericAPIView(GenericAPIView):

@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from .views import (
     LoginGenericAPIView, RegistrationGenericAPIView,
     ObtainAuthTokenAPIView, DiscardAuthTokenAPIView,
-    CustomTokenObtainPairView
+    CustomTokenObtainPairView, ChangePasswordGenericAPIView
 )
 
 
@@ -14,6 +14,9 @@ app_name = 'api-v1'
 urlpatterns = [
     # Registration
     path('register/', RegistrationGenericAPIView.as_view(), name='register'),
+
+    # Change Password
+    path('change_password/', ChangePasswordGenericAPIView.as_view(), name='change-password'),
 
     # Session Authentication
     path('session/login/', LoginGenericAPIView.as_view(), name='session-login'),

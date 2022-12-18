@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model, authenticate
+from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
@@ -12,6 +13,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 User = get_user_model()
 
 
+# Login For Session Authentication
 class LoginSerializer(serializers.Serializer):
     """
     This serializer defines two fields for "session authentication":
@@ -50,12 +52,14 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
+# Registrations
 class RegistrationModelSerializer(serializers.ModelSerializer):
     """
     This serializer defines four fields for registration:
       * email
       * username
-      * password.
+      * password
+      * password_confirm
     It will try to register the user with, when validated.
     """
     password = serializers.CharField(
@@ -103,6 +107,42 @@ class RegistrationModelSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
+# Change Password
+class ChangePasswordSerializer(serializers.Serializer):
+    """
+    This serializer defines three fields for "Change Password":
+      * old_password
+      * new_password
+      * confirm_new_password.
+    It will try to change user password with, when validated.
+    """
+    old_password = serializers.CharField(
+        max_length=255, write_only=True, required=True,
+        style={'input_type': 'password'}
+    )
+    new_password = serializers.CharField(
+        max_length=255, write_only=True, required=True,
+        validators=[validate_password], style={'input_type': 'password'}
+    )
+    confirm_new_password = serializers.CharField(
+        max_length=255, write_only=True, required=True,
+        style={'input_type': 'password'}
+    )
+
+    def validate(self, attrs):
+        new_password = attrs.get('new_password')
+        confirm_new_password = attrs.get('confirm_new_password')
+
+        if not new_password == confirm_new_password:
+            raise serializers.ValidationError(
+                {'password': "Password fields didn't match"},
+                code=HTTP_400_BAD_REQUEST
+            )
+
+        return super().validate(attrs)
+
+
+# Token Authentications
 class CustomAuthTokenSerializer(serializers.Serializer):
     """
     This serializer defines three fields for "token authentication":
@@ -151,6 +191,7 @@ class CustomAuthTokenSerializer(serializers.Serializer):
         return attrs
 
 
+# JWT Authentications
 class CustomTokenObtainSerializer(TokenObtainPairSerializer):
     """
      This serializer adds three fields to validated data apart from
