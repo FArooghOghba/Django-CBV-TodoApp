@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 
@@ -52,6 +53,17 @@ class AccountsLoginView(LoginView):
     template_name = 'accounts/login.html'
     fields = ('email', 'password')
     redirect_authenticated_user = True
+
+    def form_valid(self, form):
+        user = form.get_user()
+        if not user.is_verified:
+            form.add_error(
+                field=None,
+                error='You are not verified your account yet.'
+            )
+            return super(AccountsLoginView, self).form_invalid(form)
+
+        return super(AccountsLoginView, self).form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy('task:list')

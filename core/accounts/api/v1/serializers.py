@@ -13,45 +13,6 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 User = get_user_model()
 
 
-# Login For Session Authentication
-class LoginSerializer(serializers.Serializer):
-    """
-    This serializer defines two fields for "session authentication":
-      * email
-      * password.
-    It will try to authenticate the user with when validated.
-    """
-    email = serializers.EmailField(max_length=128)
-    password = serializers.CharField(
-        max_length=255,
-        style={'input_type': 'password'},
-        write_only=True
-    )
-
-    def validate(self, attrs):
-        request = self.context.get('request')
-        email = attrs.get('email')
-        password = attrs.get('password')
-
-        if email and password:
-            user = authenticate(request=request, email=email, password=password)
-            if not user:
-                raise serializers.ValidationError(
-                    _('Access denied: wrong username or password.'),
-                    code=HTTP_401_UNAUTHORIZED
-                )
-        else:
-            raise serializers.ValidationError(
-                _('Both "email" and "password" are required.'),
-                code=HTTP_400_BAD_REQUEST
-            )
-
-        # We have a valid user, put it in the serializer's validated_data.
-        # It will be used in the view.
-        attrs['user'] = user
-        return attrs
-
-
 # Registrations
 class RegistrationModelSerializer(serializers.ModelSerializer):
     """
@@ -142,10 +103,55 @@ class ChangePasswordSerializer(serializers.Serializer):
         return super().validate(attrs)
 
 
+# Login For Session Authentication
+class LoginSerializer(serializers.Serializer):
+    """
+    This serializer defines two fields for "session authentication":
+      * email
+      * password.
+    It will try to authenticate the user with when validated.
+    """
+    email = serializers.EmailField(max_length=128)
+    password = serializers.CharField(
+        max_length=255,
+        style={'input_type': 'password'},
+        write_only=True
+    )
+
+    def validate(self, attrs):
+        request = self.context.get('request')
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            user = authenticate(request=request, email=email, password=password)
+            if not user:
+                raise serializers.ValidationError(
+                    _('Access denied: wrong username or password.'),
+                    code=HTTP_401_UNAUTHORIZED
+                )
+
+            if not user.is_verified:
+                raise serializers.ValidationError(
+                    _('Verification: You are not verified your account yet.'),
+                    code=HTTP_401_UNAUTHORIZED
+                )
+        else:
+            raise serializers.ValidationError(
+                _('Both "email" and "password" are required.'),
+                code=HTTP_400_BAD_REQUEST
+            )
+
+        # We have a valid user, put it in the serializer's validated_data.
+        # It will be used in the view.
+        attrs['user'] = user
+        return attrs
+
+
 # Token Authentications
 class CustomAuthTokenSerializer(serializers.Serializer):
     """
-    This serializer defines three fields for "token authentication":
+    This serializer defines three fields for "Token Authentication":
       * email
       * password
       * token.
@@ -181,11 +187,21 @@ class CustomAuthTokenSerializer(serializers.Serializer):
             # users. (Assuming the default ModelBackend authentication
             # backend.)
             if not user:
-                msg = _('Unable to log in with provided credentials.')
-                raise serializers.ValidationError(msg, code='authorization')
+                raise serializers.ValidationError(
+                    _('Unable to log in with provided credentials.'),
+                    code=HTTP_401_UNAUTHORIZED
+                )
+
+            if not user.is_verified:
+                raise serializers.ValidationError(
+                    _('Verification: You are not verified your account yet.'),
+                    code=HTTP_401_UNAUTHORIZED
+                )
         else:
-            msg = _('Must include "username" and "password".')
-            raise serializers.ValidationError(msg, code='authorization')
+            raise serializers.ValidationError(
+                _('Must include "username" and "password".'),
+                code=HTTP_401_UNAUTHORIZED
+            )
 
         attrs['user'] = user
         return attrs
@@ -204,6 +220,12 @@ class CustomTokenObtainSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         validated_data = super().validate(attrs)
+
+        if not self.user.is_verified:
+            raise serializers.ValidationError(
+                _('Verification: You are not verified your account yet.'),
+                code=HTTP_401_UNAUTHORIZED
+            )
 
         validated_data['user_id'] = self.user.id
         validated_data['email'] = self.user.email
