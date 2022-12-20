@@ -4,7 +4,10 @@ from django.urls import reverse_lazy
 
 from django.contrib.auth import login
 from django.views.generic.edit import FormView
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import (
+    LoginView, LogoutView,
+    PasswordChangeView, PasswordChangeDoneView
+)
 
 from .forms import UserCreationForm
 
@@ -22,7 +25,7 @@ class AccountsRegisterFormView(FormView):
 
     def form_valid(self, form):
         """
-        If the form is valid, redirect to the supplied URL.
+        If the form is valid, redirect to the supplied URL
         :param form: registration form
         :return: if form valid register user.
         """
@@ -45,6 +48,21 @@ class AccountsRegisterFormView(FormView):
         return super(AccountsRegisterFormView, self).get(request, *args, **kwargs)
 
 
+class AccountsPasswordChangeView(PasswordChangeView):
+    """
+    A view for displaying a change password form and
+    rendering a template response.
+    """
+    template_name = 'accounts/change-password.html'
+    success_url = reverse_lazy('accounts:password_change_done')
+
+
+class AccountsPasswordChangeDoneView(PasswordChangeDoneView):
+    """
+    Render a template. Pass keyword arguments from the URLconf to the context.
+    """
+    template_name = 'accounts/change-password-done.html'
+
 class AccountsLoginView(LoginView):
     """
     Display the login form and handle the login action.
@@ -55,6 +73,12 @@ class AccountsLoginView(LoginView):
     redirect_authenticated_user = True
 
     def form_valid(self, form):
+        """
+        If the form is valid, checks for user is verified or not
+        :param form: login form
+        :return: logged-in user if user is verified or
+        going back to log-in form with error.
+        """
         user = form.get_user()
         if not user.is_verified:
             form.add_error(
