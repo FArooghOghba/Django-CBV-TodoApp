@@ -8,9 +8,9 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken as BaseObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import (
-    HTTP_201_CREATED, HTTP_202_ACCEPTED,
-    HTTP_401_UNAUTHORIZED, HTTP_204_NO_CONTENT,
-    HTTP_400_BAD_REQUEST
+    HTTP_200_OK, HTTP_201_CREATED,
+    HTTP_202_ACCEPTED, HTTP_204_NO_CONTENT,
+    HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 )
 
 from jwt import decode
@@ -26,7 +26,7 @@ from ...utils import EmailThread
 from .serializers import (
     LoginSerializer, RegistrationModelSerializer,
     CustomAuthTokenSerializer, CustomTokenObtainSerializer,
-    ChangePasswordSerializer
+    ChangePasswordSerializer, AccountActivationResendSerializer
 )
 
 
@@ -51,8 +51,8 @@ class RegistrationGenericAPIView(GenericAPIView):
 
             email = serializer.validated_data['email']
             username = serializer.validated_data['username']
-            user = get_object_or_404(User, email=email)
-            token = self.get_token_for_user(user)
+            user_obj = get_object_or_404(User, email=email)
+            token = self.get_token_for_user(user_obj)
 
             activation_email = EmailMessage(
                 'email/activation_account.tpl',
@@ -75,7 +75,7 @@ class RegistrationGenericAPIView(GenericAPIView):
         return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
 
 
-class ActivationConfirmGenericAPIView(APIView):
+class AccountActivationConfirmAPIView(APIView):
     """
    Confirm Activation view to activate user account.
    This view should be accessible for authenticated users.
@@ -108,6 +108,36 @@ class ActivationConfirmGenericAPIView(APIView):
         return Response(
             {'detail': 'Your account have been verified successfully.'},
             status=HTTP_202_ACCEPTED
+        )
+
+
+class AccountActivationResendGenericAPIView(GenericAPIView):
+    serializer_class = AccountActivationResendSerializer
+
+    def get_token_for_user(self, user):
+        refresh = RefreshToken.for_user(user)
+        return str(refresh.access_token)
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        username = user.username
+        email = user.email
+        token = self.get_token_for_user(user)
+
+        activation_email = EmailMessage(
+            'email/activation_account.tpl',
+            {
+                'user': username,
+                'token': f'http://127.0.0.1:8000/accounts/api/v1/activation/confirm/{token}/',
+            },
+            'sender@example.com',
+            [email]
+        )
+        EmailThread(activation_email).start()
+        return Response(
+            {'detail': 'Your activation resend successfully.'},
+            status=HTTP_200_OK
         )
 
 

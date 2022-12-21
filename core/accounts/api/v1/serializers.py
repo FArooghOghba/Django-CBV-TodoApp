@@ -68,6 +68,34 @@ class RegistrationModelSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 
 
+class AccountActivationResendSerializer(serializers.Serializer):
+    """
+    This serializer defines a field for resending account activation email:
+      * email
+    It will try to resend email activation to the user when validated.
+    """
+    email = serializers.EmailField(required=True)
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+
+        try:
+            user_obj = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(
+                {'detail': 'user does not exist.'}
+            )
+
+        if user_obj.is_verified:
+            raise serializers.ValidationError(
+                {'detail': 'Your account has already verified.'},
+                code=HTTP_400_BAD_REQUEST
+            )
+
+        attrs['user'] = user_obj
+        return super().validate(attrs)
+
+
 # Change Password
 class ChangePasswordSerializer(serializers.Serializer):
     """

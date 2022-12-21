@@ -5,7 +5,7 @@ from .views import (
     LoginGenericAPIView, RegistrationGenericAPIView,
     ObtainAuthTokenAPIView, DiscardAuthTokenAPIView,
     CustomTokenObtainPairView, ChangePasswordGenericAPIView,
-    ActivationConfirmGenericAPIView
+    AccountActivationConfirmAPIView, AccountActivationResendGenericAPIView
 )
 
 
@@ -15,7 +15,10 @@ app_name = 'api-v1'
 urlpatterns = [
     # Registration
     path('register/', RegistrationGenericAPIView.as_view(), name='register'),
-    path('activation/confirm/<str:token>/', ActivationConfirmGenericAPIView.as_view(), name='activation-confirm'),
+
+    # Activation Email
+    path('activation/confirm/<str:token>/', AccountActivationConfirmAPIView.as_view(), name='activation-confirm'),
+    path('activation/resend/', AccountActivationResendGenericAPIView.as_view(), name='activation-resend'),
 
     # Change Password
     path('change_password/', ChangePasswordGenericAPIView.as_view(), name='change-password'),
