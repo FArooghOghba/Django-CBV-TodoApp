@@ -6,6 +6,7 @@ djangorestframework
 djangorestframework-simplejwt
 drf-yasg[validation]
 django-filter
+django-mail-templated
 python-decouple
 markdown
 
