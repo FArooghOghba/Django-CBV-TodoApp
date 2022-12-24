@@ -5,7 +5,8 @@ from .views import (
     LoginGenericAPIView, RegistrationGenericAPIView,
     ObtainAuthTokenAPIView, DiscardAuthTokenAPIView,
     CustomTokenObtainPairView, ChangePasswordGenericAPIView,
-    AccountActivationConfirmAPIView, AccountActivationResendGenericAPIView
+    AccountActivationConfirmAPIView, AccountActivationResendGenericAPIView,
+    ResetPasswordGenericAPIView, ResetPasswordConfirmGenericAPIView
 )
 
 
@@ -19,6 +20,10 @@ urlpatterns = [
     # Activation Email
     path('activation/confirm/<str:token>/', AccountActivationConfirmAPIView.as_view(), name='activation-confirm'),
     path('activation/resend/', AccountActivationResendGenericAPIView.as_view(), name='activation-resend'),
+
+    # Reset Password Manager With JWT
+    path('reset_password/', ResetPasswordGenericAPIView.as_view(), name='reset_password'),
+    path('reset_password/confirm/<str:token>/', ResetPasswordConfirmGenericAPIView.as_view(), name='reset_password_confirm'),
 
     # Change Password
     path('change_password/', ChangePasswordGenericAPIView.as_view(), name='change-password'),
