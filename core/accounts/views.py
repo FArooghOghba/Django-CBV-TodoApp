@@ -8,7 +8,9 @@ from django.views.generic.edit import FormView
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.views import (
     LoginView, LogoutView,
-    PasswordChangeView, PasswordChangeDoneView
+    PasswordChangeView, PasswordChangeDoneView,
+    PasswordResetView, PasswordResetDoneView,
+    PasswordResetConfirmView, PasswordResetCompleteView
 )
 
 from jwt import decode
@@ -185,6 +187,28 @@ class AccountsPasswordChangeDoneView(PasswordChangeDoneView):
     Render a template. Pass keyword arguments from the URLconf to the context.
     """
     template_name = 'accounts/change-password-done.html'
+
+
+# Password Reset
+class AccountPasswordResetView(PasswordResetView):
+    template_name = 'accounts/password-reset/password-reset.html'
+    from_email = 'sender@example.com'
+    html_email_template_name = 'email/reset_password.html'
+    email_template_name = 'email/reset_password.html'
+    success_url = reverse_lazy('accounts:password_reset_done')
+
+
+class AccountPasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'accounts/password-reset/password-reset-done.html'
+
+
+class AccountPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'accounts/password-reset/password-reset-confirm.html'
+    success_url = reverse_lazy('accounts:password_reset_complete')
+
+
+class AccountPasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'accounts/password-reset/password-reset-complete.html'
 
 
 # Account Login
