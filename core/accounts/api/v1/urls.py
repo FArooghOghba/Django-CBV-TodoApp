@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
 from .views import (
     LoginGenericAPIView, RegistrationGenericAPIView,
-    ObtainAuthTokenAPIView, DiscardAuthTokenAPIView,
+    CustomObtainAuthTokenView, DiscardAuthTokenAPIView,
     CustomTokenObtainPairView, ChangePasswordGenericAPIView,
     AccountActivationConfirmAPIView, AccountActivationResendGenericAPIView,
     ResetPasswordGenericAPIView, ResetPasswordConfirmGenericAPIView
@@ -32,7 +32,7 @@ urlpatterns = [
     path('session/login/', LoginGenericAPIView.as_view(), name='session-login'),
 
     # Token Authentication
-    path('token/login/', ObtainAuthTokenAPIView.as_view(), name='token-login'),
+    path('token/login/', CustomObtainAuthTokenView.as_view(), name='token-login'),
     path('token/logout/', DiscardAuthTokenAPIView.as_view(), name='token-logout'),
 
     # JWT Authentication

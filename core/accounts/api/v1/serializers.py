@@ -239,7 +239,7 @@ class CustomAuthTokenSerializer(serializers.Serializer):
       * token.
     It will try to authenticate to give a token to the user.
     """
-    email = serializers.CharField(
+    email = serializers.EmailField(
         label=_("Email"),
         write_only=True
     )
