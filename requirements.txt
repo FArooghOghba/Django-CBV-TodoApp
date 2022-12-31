@@ -12,3 +12,5 @@ markdown
 
 # Development Packages
 django-debug-toolbar
+pytest
+pytest-django

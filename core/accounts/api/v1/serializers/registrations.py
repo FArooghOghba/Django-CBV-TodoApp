@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.db.models import Q
-from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
 from rest_framework.status import HTTP_400_BAD_REQUEST
@@ -44,7 +43,7 @@ class RegistrationModelSerializer(serializers.ModelSerializer):
 
         if not password == password_confirm:
             raise serializers.ValidationError(
-                _('Passwords must be the same.'),
+                'Passwords must be the same.',
                 code=HTTP_400_BAD_REQUEST
             )
 
@@ -54,7 +53,7 @@ class RegistrationModelSerializer(serializers.ModelSerializer):
 
         if user:
             raise serializers.ValidationError(
-                _('User exists, login or choose another email.'),
+                'User exists, login or choose another email.',
                 code=HTTP_400_BAD_REQUEST
             )
 
