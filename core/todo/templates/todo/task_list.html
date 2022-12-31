@@ -12,9 +12,14 @@
         </div>
 
         {% if request.user.is_authenticated %}
-            <a href="{% url 'accounts:logout' %}">LogOut</a>
-        {% else %}
-            <a href="{% url 'accounts:login' %}">LogIn</a>
+            <ul>
+                <li>
+                    <a href="{% url 'accounts:logout' %}">LogOut</a>
+                </li>
+                <li>
+                    <a href="{% url 'accounts:password_change' %}">Change Password</a>
+                </li>
+            </ul>
         {% endif %}
     </div>
 

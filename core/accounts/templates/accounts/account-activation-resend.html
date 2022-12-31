@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="header-bar">
+        <a href="{% url 'accounts:login' %}">&#8592; Back</a>
+    </div>
+
+    <div class="card-body">
+        <h3>You're not verified your account yet !!</h3>
+        <p>
+            Please go to your email and verify your account or if
+            your verification email has been expired get another one.
+        </p>
+        <form method="POST">
+            {% csrf_token %}
+            <p>Enter your email for resending activation email</p>
+
+            <span style="color: red;">{{ form.errors }}</span>
+            <label>
+                {{ form.email.label }}
+            </label>
+            {{ form.email }}
+            <input class="button" type="submit" value="Resend Activation email" style="margin-top: 10px;">
+        </form>
+    </div>
+
+{% endblock content%}

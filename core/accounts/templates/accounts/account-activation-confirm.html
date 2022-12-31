@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="header-bar">
+        <a href="{% url 'accounts:login' %}">&#8592; Login</a>
+    </div>
+
+    <div class="card-body">
+        <p>{{ response }}</p>
+    </div>
+
+{% endblock content%}
