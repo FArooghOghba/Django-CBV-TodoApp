@@ -16,7 +16,7 @@ class RegistrationModelSerializer(serializers.ModelSerializer):
       * email
       * username
       * password
-      * password_confirm
+      * confirm_password
     It will try to register the user and send email with, when validated.
     """
     password = serializers.CharField(
@@ -25,7 +25,7 @@ class RegistrationModelSerializer(serializers.ModelSerializer):
         style={'input_type': 'password'},
         write_only=True
     )
-    password_confirm = serializers.CharField(
+    confirm_password = serializers.CharField(
         max_length=255,
         style={'input_type': 'password'},
         write_only=True
@@ -33,15 +33,15 @@ class RegistrationModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model= User
-        fields = ('email', 'username', 'password', 'password_confirm')
+        fields = ('email', 'username', 'password', 'confirm_password')
 
     def validate(self, attrs):
         email = attrs.get('email')
         username = attrs.get('username')
         password = attrs.get('password')
-        password_confirm = attrs.get('password_confirm')
+        confirm_password = attrs.get('confirm_password')
 
-        if not password == password_confirm:
+        if not password == confirm_password:
             raise serializers.ValidationError(
                 'Passwords must be the same.',
                 code=HTTP_400_BAD_REQUEST
@@ -60,7 +60,7 @@ class RegistrationModelSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        validated_data.pop('password_confirm', None)
+        validated_data.pop('confirm_password', None)
         return User.objects.create_user(**validated_data)
 
 

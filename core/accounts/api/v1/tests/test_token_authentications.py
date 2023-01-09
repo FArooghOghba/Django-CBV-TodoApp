@@ -52,7 +52,6 @@ class TestAccountsTokenAuthentication:
         }
 
         response = api_client.post(path=url, data=data)
-        print(response.data)
         assert response.status_code == status_code
 
         if status_code == HTTP_200_OK:
