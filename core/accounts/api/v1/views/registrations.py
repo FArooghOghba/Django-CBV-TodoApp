@@ -123,13 +123,16 @@ class AccountActivationResendGenericAPIView(GenericAPIView):
         user = serializer.validated_data['user']
         username = user.username
         email = user.email
+
         token = self.get_token_for_user(user)
+        domain = 'http://127.0.0.1:8000/'
+        url = 'accounts/api/v1/activation/confirm/'
 
         activation_email = EmailMessage(
             'email/activation_account.tpl',
             {
                 'user': username,
-                'token': f'http://127.0.0.1:8000/accounts/api/v1/activation/confirm/{token}/',
+                'token': f'{domain}{url}{token}/',
             },
             'sender@example.com',
             [email]
