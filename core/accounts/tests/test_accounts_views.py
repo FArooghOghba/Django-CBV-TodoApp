@@ -9,8 +9,6 @@ from rest_framework.status import (
 )
 from time import sleep
 
-from ..forms import CustomAuthenticationForm
-
 
 User = get_user_model()
 
@@ -109,3 +107,27 @@ class TestAccountsAuthenticationView:
 
         response = client.post(url, data)
         assert response.status_code == HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.django_db
+class TestAccountsPasswordManagement:
+
+    def test_accounts_reset_password_view(
+            self, client, test_user, mailoutbox
+    ):
+        url = reverse(
+            'accounts:password_reset',
+        )
+
+        data = {
+            'email': test_user.email
+        }
+
+        response = client.post(path=url, data=data)
+
+        assert response.status_code == HTTP_302_FOUND
+
+        sleep(1)
+        assert len(mailoutbox) == 1
+        mail = mailoutbox[0]
+        assert list(mail.to) == [test_user.email]

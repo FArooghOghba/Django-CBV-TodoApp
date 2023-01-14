@@ -94,7 +94,6 @@ class TestAccountsAPIPasswordManagements:
             'email': 'test_email@test.com'
         }
 
-        api_client.force_login(test_user)
         response = api_client.post(path=url, data=data)
 
         sleep(1)
