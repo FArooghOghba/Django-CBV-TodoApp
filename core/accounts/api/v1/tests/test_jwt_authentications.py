@@ -28,7 +28,7 @@ def test_user():
 
 
 @pytest.mark.django_db
-class TestAccountsJWTAuthentication:
+class TestAccountsAPIJWTAuthentication:
     @pytest.mark.parametrize(
             'email, password, is_verified, status_code', [
                 ('wrong_email', 'far!@#$%', False, HTTP_401_UNAUTHORIZED),

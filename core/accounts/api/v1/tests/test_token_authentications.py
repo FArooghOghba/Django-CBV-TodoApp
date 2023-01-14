@@ -29,7 +29,7 @@ def test_user():
     return user
 
 @pytest.mark.django_db
-class TestAccountsTokenAuthentication:
+class TestAccountsAPITokenAuthentication:
     @pytest.mark.parametrize(
             'email, password, status_code, is_verified', [
                 ('wrong_email', 'far!@#$%', HTTP_400_BAD_REQUEST, False),
