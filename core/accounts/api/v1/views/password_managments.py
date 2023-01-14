@@ -75,16 +75,20 @@ class ResetPasswordGenericAPIView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         user = serializer.validated_data['user']
         username = user.username
         email = user.email
+
         token = self.get_token_for_user(user)
+        domain = 'http://127.0.0.1:8000/'
+        url = 'accounts/api/v1/reset_password/confirm/'
 
         activation_email = EmailMessage(
             'email/reset_password.tpl',
             {
                 'user': username,
-                'token': f'http://127.0.0.1:8000/accounts/api/v1/reset_password/confirm/{token}/',
+                'token': f'{domain}{url}{token}/',
             },
             'sender@example.com',
             [email]
