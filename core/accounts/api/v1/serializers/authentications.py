@@ -4,6 +4,7 @@ from rest_framework import serializers
 from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.exceptions import InvalidToken
 
 
 User = get_user_model()
@@ -128,9 +129,8 @@ class CustomTokenObtainSerializer(TokenObtainPairSerializer):
         validated_data = super().validate(attrs)
 
         if not self.user.is_verified:
-            raise serializers.ValidationError(
+            raise InvalidToken(
                 'Verification: You are not verified your account yet.',
-                code=HTTP_401_UNAUTHORIZED
             )
 
         validated_data['user_id'] = self.user.id
