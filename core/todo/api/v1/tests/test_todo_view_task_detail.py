@@ -4,7 +4,10 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 
 from rest_framework.test import APIClient
-
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN, HTTP_401_UNAUTHORIZED,
+    HTTP_202_ACCEPTED, HTTP_200_OK
+)
 from todo.models import Task
 
 
@@ -29,6 +32,10 @@ def test_task(test_user):
     )
     return task
 
+@pytest.fixture
+def api_client():
+   return APIClient()
+
 
 @pytest.mark.django_db
 class TestTodoAPITaskDetail:
@@ -36,9 +43,8 @@ class TestTodoAPITaskDetail:
     Test with pytest for TaskModelViewset for
     task detail.
     """
-    client = APIClient()
 
-    def test_get_task_detail_response_403_forbidden_status(self):
+    def test_get_task_detail_response_403_forbidden_status(self, api_client):
         """
         Test response of get request to task detail
         with unauthorized user.
@@ -48,10 +54,12 @@ class TestTodoAPITaskDetail:
             'task:api-v1:task-detail',
             kwargs={'pk': 1}
         )
-        response = self.client.get(path=url)
-        assert response.status_code == 403
+        response = api_client.get(path=url)
+        assert response.status_code == HTTP_403_FORBIDDEN
 
-    def test_get_task_detail_response_200_ok_status(self, test_user, test_task):
+    def test_get_task_detail_response_200_ok_status(
+            self, api_client, test_user, test_task
+    ):
         """
         Test response of get request to task detail
         with authorized user.
@@ -61,11 +69,13 @@ class TestTodoAPITaskDetail:
             'task:api-v1:task-detail',
             kwargs={'pk': test_task.pk}
         )
-        self.client.force_login(user=test_user)
-        response = self.client.get(path=url)
-        assert response.status_code == 200
+        api_client.force_login(user=test_user)
+        response = api_client.get(path=url)
+        assert response.status_code == HTTP_200_OK
 
-    def test_delete_task_detail_response_200_ok_status(self, test_user, test_task):
+    def test_delete_task_detail_response_200_ok_status(
+            self, api_client, test_user, test_task
+    ):
         """
         Test response of delete request to task detail
         with authorized user.
@@ -75,11 +85,13 @@ class TestTodoAPITaskDetail:
             'task:api-v1:task-detail',
             kwargs={'pk': test_task.pk}
         )
-        self.client.force_login(user=test_user)
-        response = self.client.get(path=url)
-        assert response.status_code == 200
+        api_client.force_login(user=test_user)
+        response = api_client.get(path=url)
+        assert response.status_code == HTTP_200_OK
 
-    def test_put_task_detail_response_200_ok_status(self, test_user, test_task):
+    def test_put_task_detail_response_200_ok_status(
+            self, api_client, test_user, test_task
+    ):
         """
         Test response of put request to task detail
         with authorized user.
@@ -90,11 +102,13 @@ class TestTodoAPITaskDetail:
             kwargs={'pk': test_task.pk}
         )
         test_task.title = 'test_title_edited'
-        self.client.force_login(user=test_user)
-        response = self.client.get(path=url)
-        assert response.status_code == 200
+        api_client.force_login(user=test_user)
+        response = api_client.get(path=url)
+        assert response.status_code == HTTP_200_OK
 
-    def test_put_task_detail_response_403_unauthorized_status(self, test_task):
+    def test_put_task_detail_response_403_unauthorized_status(
+            self, api_client, test_task
+    ):
         """
         Test response of put request to task detail
         with unauthorized user.
@@ -105,5 +119,5 @@ class TestTodoAPITaskDetail:
             kwargs={'pk': test_task.pk}
         )
         test_task.title = 'test_title_edited'
-        response = self.client.get(path=url)
-        assert response.status_code == 403
+        response = api_client.get(path=url)
+        assert response.status_code == HTTP_403_FORBIDDEN
