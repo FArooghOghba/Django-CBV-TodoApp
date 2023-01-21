@@ -23,7 +23,7 @@ def test_user():
 @pytest.fixture
 def test_task(test_user):
     task = Task.objects.create(
-        user = test_user,
+        user=test_user,
         title='test_title',
         descriptions='test_descriptions'
     )
@@ -44,4 +44,3 @@ def test_task_list_serializer(client, test_user):
         tasks, many=True
     ).data
     assert response.data == expected_data
-

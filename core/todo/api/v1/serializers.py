@@ -13,7 +13,9 @@ class TaskModelSerializer(serializers.ModelSerializer):
     Task Serializer creates from ModelSerializer.
     """
     snippet = serializers.ReadOnlyField(source='get_snippet')
-    absolute_url = serializers.SerializerMethodField(method_name='get_absolute_url')
+    absolute_url = serializers.SerializerMethodField(
+        method_name='get_absolute_url'
+    )
 
     def get_absolute_url(self, task_obj):
         request = self.context.get('request')

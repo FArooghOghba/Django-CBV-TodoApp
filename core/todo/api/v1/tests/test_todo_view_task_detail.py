@@ -5,9 +5,10 @@ from django.contrib.auth import get_user_model
 
 from rest_framework.test import APIClient
 from rest_framework.status import (
-    HTTP_403_FORBIDDEN, HTTP_401_UNAUTHORIZED,
-    HTTP_202_ACCEPTED, HTTP_200_OK
+    HTTP_403_FORBIDDEN,
+    HTTP_200_OK
 )
+
 from todo.models import Task
 
 
@@ -23,18 +24,20 @@ def test_user():
     )
     return user
 
+
 @pytest.fixture
 def test_task(test_user):
     task = Task.objects.create(
-        user = test_user,
+        user=test_user,
         title='test_title',
         descriptions='test_descriptions'
     )
     return task
 
+
 @pytest.fixture
 def api_client():
-   return APIClient()
+    return APIClient()
 
 
 @pytest.mark.django_db
