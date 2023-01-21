@@ -13,6 +13,7 @@ class TestAccountsModels:
       'username': 'test_username',
       'password': 'test_password'
     }
+
     def test_accounts_model_create_user(self):
         test_user = User.objects.create_user(**self.data)
         assert User.objects.count() == 1

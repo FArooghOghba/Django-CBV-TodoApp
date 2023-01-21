@@ -16,6 +16,7 @@ def test_user():
     )
     return user
 
+
 @pytest.mark.django_db
 class TestAccountsAuthenticationView2:
 

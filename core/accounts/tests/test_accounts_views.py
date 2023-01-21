@@ -22,6 +22,7 @@ def test_user():
     )
     return user
 
+
 @pytest.mark.django_db
 class TestAccountsRegistrationViews:
 
@@ -42,7 +43,9 @@ class TestAccountsRegistrationViews:
         email = mailoutbox[0]
         assert email.subject == 'Email Verification'
 
-    def test_accounts_activation_resend_view(self, client, test_user, mailoutbox):
+    def test_accounts_activation_resend_view(
+            self, client, test_user, mailoutbox
+    ):
 
         url = reverse('accounts:activation_resend')
         data = {

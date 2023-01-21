@@ -22,7 +22,7 @@ from decouple import config
 
 from .utils import EmailThread
 from .forms import (
-    UserCreationModelForm,AccountActivationResendForm,
+    UserCreationModelForm, AccountActivationResendForm,
     CustomAuthenticationForm
 )
 
@@ -89,7 +89,9 @@ class AccountsRegisterFormView(FormView):
 
         if self.request.user.is_authenticated:
             return redirect('task:list')
-        return super(AccountsRegisterFormView, self).get(request, *args, **kwargs)
+        return super(
+            AccountsRegisterFormView, self
+        ).get(request, *args, **kwargs)
 
 
 # Account Activation Confirm
@@ -104,7 +106,9 @@ class AccountActivationConfirmTemplateView(TemplateView):
         context = {}
         token = kwargs.get('token')
         try:
-            decoded_token = decode(jwt=token, key=config('SECRET_KEY'), algorithms=['HS256'])
+            decoded_token = decode(
+                jwt=token, key=config('SECRET_KEY'), algorithms=['HS256']
+            )
             user_id = decoded_token.get('user_id')
             user = User.objects.get(pk=user_id)
             context["response"] = "Your account activated successfully."
@@ -120,7 +124,9 @@ class AccountActivationConfirmTemplateView(TemplateView):
         except InvalidSignatureError:
             context["response"] = "Your token is not valid."
 
-        return render(request, template_name=self.template_name, context=context)
+        return render(
+            request, template_name=self.template_name, context=context
+        )
 
 
 # Account Activation Email Send
@@ -144,6 +150,7 @@ class AccountActivationEmailResendFormView(FormView):
     def get_token_for_user(self, user):
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
+
     def form_valid(self, form):
         """
         If the form is valid, redirect to the supplied URL
@@ -159,7 +166,9 @@ class AccountActivationEmailResendFormView(FormView):
                 field='email',
                 error='Enter your email that you register with it.'
             )
-            return super(AccountActivationEmailResendFormView, self).form_invalid(form)
+            return super(
+                AccountActivationEmailResendFormView, self
+            ).form_invalid(form)
 
         token = self.get_token_for_user(user_obj)
         username = user_obj.username
@@ -179,7 +188,9 @@ class AccountActivationEmailResendFormView(FormView):
 
         EmailThread(activation_email).start()
 
-        return super(AccountActivationEmailResendFormView, self).form_valid(form)
+        return super(
+            AccountActivationEmailResendFormView, self
+        ).form_valid(form)
 
 
 # Accounts Password Change
