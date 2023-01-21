@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model, authenticate
-from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
 from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.exceptions import InvalidToken
 
 
 User = get_user_model()
@@ -31,21 +31,23 @@ class LoginSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         if email and password:
-            user = authenticate(request=request, email=email, password=password)
+            user = authenticate(
+                request=request, email=email, password=password
+            )
             if not user:
                 raise serializers.ValidationError(
-                    _('Access denied: wrong username or password.'),
+                    'Access denied: wrong username or password.',
                     code=HTTP_401_UNAUTHORIZED
                 )
 
             if not user.is_verified:
                 raise serializers.ValidationError(
-                    _('Verification: You are not verified your account yet.'),
+                    'Verification: You are not verified your account yet.',
                     code=HTTP_401_UNAUTHORIZED
                 )
         else:
             raise serializers.ValidationError(
-                _('Both "email" and "password" are required.'),
+                'Both "email" and "password" are required.',
                 code=HTTP_400_BAD_REQUEST
             )
 
@@ -65,17 +67,17 @@ class CustomAuthTokenSerializer(serializers.Serializer):
     It will try to authenticate to give a token to the user.
     """
     email = serializers.EmailField(
-        label=_("Email"),
+        label="Email",
         write_only=True
     )
     password = serializers.CharField(
-        label=_("Password"),
+        label="Password",
         style={'input_type': 'password'},
         trim_whitespace=False,
         write_only=True
     )
     token = serializers.CharField(
-        label=_("Token"),
+        label="Token",
         read_only=True
     )
 
@@ -95,18 +97,18 @@ class CustomAuthTokenSerializer(serializers.Serializer):
             # backend.)
             if not user:
                 raise serializers.ValidationError(
-                    _('Unable to log in with provided credentials.'),
+                    'Unable to log in with provided credentials.',
                     code=HTTP_401_UNAUTHORIZED
                 )
 
             if not user.is_verified:
                 raise serializers.ValidationError(
-                    _('Verification: You are not verified your account yet.'),
+                    'Verification: You are not verified your account yet.',
                     code=HTTP_401_UNAUTHORIZED
                 )
         else:
             raise serializers.ValidationError(
-                _('Must include "username" and "password".'),
+                'Must include "username" and "password".',
                 code=HTTP_401_UNAUTHORIZED
             )
 
@@ -129,9 +131,8 @@ class CustomTokenObtainSerializer(TokenObtainPairSerializer):
         validated_data = super().validate(attrs)
 
         if not self.user.is_verified:
-            raise serializers.ValidationError(
-                _('Verification: You are not verified your account yet.'),
-                code=HTTP_401_UNAUTHORIZED
+            raise InvalidToken(
+                'Verification: You are not verified your account yet.',
             )
 
         validated_data['user_id'] = self.user.id

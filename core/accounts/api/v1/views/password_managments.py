@@ -34,7 +34,9 @@ class ResetPasswordConfirmGenericAPIView(GenericAPIView):
 
     def put(self, request, token, *args, **kwargs):
         try:
-            decoded_token = decode(jwt=token, key=config('SECRET_KEY'), algorithms=['HS256'])
+            decoded_token = decode(
+                jwt=token, key=config('SECRET_KEY'), algorithms=['HS256']
+            )
             user_id = decoded_token.get('user_id')
         except ExpiredSignatureError:
             return Response(
@@ -62,6 +64,7 @@ class ResetPasswordConfirmGenericAPIView(GenericAPIView):
 
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
+
 class ResetPasswordGenericAPIView(GenericAPIView):
     """
     Reset Password view to request for changing user's password.
@@ -75,16 +78,20 @@ class ResetPasswordGenericAPIView(GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         user = serializer.validated_data['user']
         username = user.username
         email = user.email
+
         token = self.get_token_for_user(user)
+        domain = 'http://127.0.0.1:8000/'
+        url = 'accounts/api/v1/reset_password/confirm/'
 
         activation_email = EmailMessage(
             'email/reset_password.tpl',
             {
                 'user': username,
-                'token': f'http://127.0.0.1:8000/accounts/api/v1/reset_password/confirm/{token}/',
+                'token': f'{domain}{url}{token}/',
             },
             'sender@example.com',
             [email]
@@ -92,12 +99,16 @@ class ResetPasswordGenericAPIView(GenericAPIView):
         EmailThread(activation_email).start()
         return Response(
             {
-                'detail': "We've emailed you a link for resetting you password, "
-                          "if you don't receive an email, please make sure you've"
-                          "entered the email address your registered with."
+                'detail': "We've emailed you a link for "
+                          "resetting you password, "
+                          "if you don't receive an email, "
+                          "please make sure you've"
+                          "entered the email address your "
+                          "registered with."
             },
             status=HTTP_200_OK
         )
+
 
 class ChangePasswordGenericAPIView(GenericAPIView):
     """
@@ -107,6 +118,7 @@ class ChangePasswordGenericAPIView(GenericAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
     serializer_class = ChangePasswordSerializer
+
     def get_object(self):
         user_obj = self.request.user
         return user_obj

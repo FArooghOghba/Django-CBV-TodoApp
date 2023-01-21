@@ -12,3 +12,7 @@ markdown
 
 # Development Packages
 django-debug-toolbar
+flake8
+black
+pytest
+pytest-django

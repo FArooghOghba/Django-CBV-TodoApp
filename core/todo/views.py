@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -24,7 +24,8 @@ class TaskListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tasks'] = self.model.objects.filter(user=self.request.user)
-        context['incomplete_task_count'] = context['tasks'].filter(complete=False).count()
+        task_count = context['tasks'].filter(complete=False).count()
+        context['incomplete_task_count'] = task_count
 
         search = self.request.GET.get('search', '')
         if search:
@@ -38,8 +39,9 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
     """
     Render a "detail" view of a task object.
 
-    By default, this is a model instance looked up from `self.queryset`, but the
-    view will support display of *any* object by overriding `self.get_object()`.
+    By default, this is a model instance looked up
+    from `self.queryset`, but the view will support
+    display of *any* object by overriding `self.get_object()`.
     """
 
     model = Task

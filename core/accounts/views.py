@@ -1,11 +1,10 @@
-from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
-
+from django.contrib import messages
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import get_user_model
 from django.contrib.auth.views import (
     LoginView, LogoutView,
     PasswordChangeView, PasswordChangeDoneView,
@@ -22,7 +21,10 @@ from mail_templated import EmailMessage
 from decouple import config
 
 from .utils import EmailThread
-from .forms import UserCreationModelForm, AccountActivationResendForm
+from .forms import (
+    UserCreationModelForm, AccountActivationResendForm,
+    CustomAuthenticationForm
+)
 
 
 User = get_user_model()
@@ -57,17 +59,22 @@ class AccountsRegisterFormView(FormView):
             username = user_obj.username
             token = self.get_token_for_user(user_obj)
 
+            domain = 'http://127.0.0.1:8000/'
+            url = 'accounts/activation/confirm/'
+
             activation_email = EmailMessage(
                 'email/activation_account.tpl',
                 {
                     'user': username,
-                    'token': f'http://127.0.0.1:8000/accounts/activation/confirm/{token}/',
+                    'token': f'{domain}{url}{token}/',
                 },
                 'sender@example.com',
                 [email]
             )
             EmailThread(activation_email).start()
-            return HttpResponseRedirect(reverse_lazy('accounts:activation_send'))
+            return HttpResponseRedirect(
+                reverse_lazy('accounts:activation_send')
+            )
 
         return super(AccountsRegisterFormView, self).form_valid(form)
 
@@ -82,7 +89,9 @@ class AccountsRegisterFormView(FormView):
 
         if self.request.user.is_authenticated:
             return redirect('task:list')
-        return super(AccountsRegisterFormView, self).get(request, *args, **kwargs)
+        return super(
+            AccountsRegisterFormView, self
+        ).get(request, *args, **kwargs)
 
 
 # Account Activation Confirm
@@ -97,7 +106,9 @@ class AccountActivationConfirmTemplateView(TemplateView):
         context = {}
         token = kwargs.get('token')
         try:
-            decoded_token = decode(jwt=token, key=config('SECRET_KEY'), algorithms=['HS256'])
+            decoded_token = decode(
+                jwt=token, key=config('SECRET_KEY'), algorithms=['HS256']
+            )
             user_id = decoded_token.get('user_id')
             user = User.objects.get(pk=user_id)
             context["response"] = "Your account activated successfully."
@@ -113,7 +124,9 @@ class AccountActivationConfirmTemplateView(TemplateView):
         except InvalidSignatureError:
             context["response"] = "Your token is not valid."
 
-        return render(request, template_name=self.template_name, context=context)
+        return render(
+            request, template_name=self.template_name, context=context
+        )
 
 
 # Account Activation Email Send
@@ -137,6 +150,7 @@ class AccountActivationEmailResendFormView(FormView):
     def get_token_for_user(self, user):
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
+
     def form_valid(self, form):
         """
         If the form is valid, redirect to the supplied URL
@@ -152,15 +166,21 @@ class AccountActivationEmailResendFormView(FormView):
                 field='email',
                 error='Enter your email that you register with it.'
             )
-            return super(AccountActivationEmailResendFormView, self).form_invalid(form)
+            return super(
+                AccountActivationEmailResendFormView, self
+            ).form_invalid(form)
 
         token = self.get_token_for_user(user_obj)
         username = user_obj.username
+
+        domain = 'http://127.0.0.1:8000/'
+        url = 'accounts/activation/confirm/'
+
         activation_email = EmailMessage(
             'email/activation_account.tpl',
             {
                 'user': username,
-                'token': f'http://127.0.0.1:8000/accounts/activation/confirm/{token}/',
+                'token': f'{domain}{url}{token}/',
             },
             'sender@example.com',
             [email]
@@ -168,7 +188,9 @@ class AccountActivationEmailResendFormView(FormView):
 
         EmailThread(activation_email).start()
 
-        return super(AccountActivationEmailResendFormView, self).form_valid(form)
+        return super(
+            AccountActivationEmailResendFormView, self
+        ).form_valid(form)
 
 
 # Accounts Password Change
@@ -218,8 +240,11 @@ class AccountsLoginView(LoginView):
     """
 
     template_name = 'accounts/login.html'
+    form_class = CustomAuthenticationForm
     fields = ('email', 'password')
     redirect_authenticated_user = True
+    success_msg = 'Logged in successfully'
+    error_msg = 'Enter a correct email and password'
 
     def get_success_url(self):
         return reverse_lazy('task:list')
@@ -233,15 +258,24 @@ class AccountsLoginView(LoginView):
         """
         user = form.get_user()
         if not user.is_verified:
+            messages.info(self.request, 'verify')
             return HttpResponseRedirect(
-                reverse_lazy('accounts:activation_resend'))
+                reverse_lazy('accounts:activation_resend')
+            )
             # form.add_error(
             #     field=None,
             #     error='You are not verified your account yet.'
             # )
             # return super(AccountsLoginView, self).form_invalid(form)
 
+        messages.success(self.request, self.success_msg)
         return super(AccountsLoginView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, self.error_msg)
+        response = super(AccountsLoginView, self).form_invalid(form)
+        response.status_code = 401
+        return response
 
 
 # Account Logout
