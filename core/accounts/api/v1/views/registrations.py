@@ -74,6 +74,7 @@ class RegistrationGenericAPIView(GenericAPIView):
 
         return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
 
+
 class AccountActivationConfirmAPIView(APIView):
     """
     Confirm Activation view to activate user account.
@@ -111,12 +112,14 @@ class AccountActivationConfirmAPIView(APIView):
             status=HTTP_202_ACCEPTED
         )
 
+
 class AccountActivationResendGenericAPIView(GenericAPIView):
     serializer_class = AccountActivationResendSerializer
 
     def get_token_for_user(self, user):
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
+
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)

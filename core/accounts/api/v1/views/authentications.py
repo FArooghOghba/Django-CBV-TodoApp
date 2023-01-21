@@ -44,10 +44,12 @@ class LoginGenericAPIView(GenericAPIView):
 # Token Authentication
 class CustomObtainAuthTokenView(ObtainAuthToken):
     """
-    get or create token view to get user credentials with "Token Authentication".
+    get or create token view to get user credentials
+    with "Token Authentication".
     This view should be accessible also for unauthenticated users.
     """
     serializer_class = CustomAuthTokenSerializer
+
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(
             data=request.data,
@@ -73,6 +75,7 @@ class DiscardAuthTokenAPIView(APIView):
     This view should be accessible for authenticated users.
     """
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
         request.user.auth_token.delete()
         return Response(status=HTTP_204_NO_CONTENT)

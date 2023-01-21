@@ -20,7 +20,7 @@ User = get_user_model()
 
 @pytest.fixture
 def api_client():
-   return APIClient()
+    return APIClient()
 
 
 @pytest.fixture
@@ -81,7 +81,6 @@ class TestAccountsAPIPasswordManagements:
 
         assert response.status_code == status_code
 
-
     def test_reset_password_view(
             self, api_client, test_user, mailoutbox
     ):
@@ -104,7 +103,6 @@ class TestAccountsAPIPasswordManagements:
         assert mail.subject == 'Reset Password'
         assert list(mail.to) == [test_user.email]
 
-
     def test_reset_password_confirm_view(
             self, api_client, test_user, mailoutbox
     ):
@@ -125,4 +123,3 @@ class TestAccountsAPIPasswordManagements:
         # check token
         assert response.status_code == HTTP_202_ACCEPTED
         assert mailoutbox[0].context['token'] == f'http://127.0.0.1:8000{url}'
-
