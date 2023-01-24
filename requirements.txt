@@ -16,3 +16,4 @@ flake8
 black
 pytest
 pytest-django
+Faker
