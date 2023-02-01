@@ -2,6 +2,10 @@
 django >3.2,<3.3
 djangorestframework
 
+# Background proccess & cache
+celery
+redis
+
 # Third Party Packages
 djangorestframework-simplejwt
 drf-yasg[validation]
