@@ -21,10 +21,23 @@ services:
     depends_on:
       - redis
 
-  worker:
+  celery-worker:
     build: .
-    container_name: todoapp_worker
+    container_name: todoapp_celery_worker
     command: celery -A core worker --loglevel=info
+    volumes:
+      - ./core:/app
+    environment:
+      - SECRET_KEY=django-insecure-=63d50!s1*n0^5g9!1duq=6icucv0bb)9!%j=j98jdu!1lr%@8j0
+      - DEBUG=True
+    depends_on:
+      - redis
+      - backend
+
+  celery-beater:
+    build: .
+    container_name: todoapp_celery_beater
+    command: celery -A core beat -l info
     volumes:
       - ./core:/app
     environment:
