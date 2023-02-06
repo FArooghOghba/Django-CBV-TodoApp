@@ -1,3 +1,10 @@
+import requests
+
+from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -24,3 +31,18 @@ class TaskModelViewSet(ModelViewSet):
     def get_queryset(self):
         user_id = self.request.user.id
         return Task.objects.filter(user__id=user_id)
+
+
+class WeatherAPIView(APIView):
+    @method_decorator(cache_page(60 * 20, key_prefix="weather-view"))
+    def get(self, request):
+        city_name = 'Ahvaz'
+        api_key = 'a2fa7b56cab242ab3dbc85164885ca3b'
+        units = 'metric'
+        open_weather_url = f"https://api.openweathermap.org/data/2.5/weather?" \
+                           f"q={city_name}&appid={api_key}&units={units}"
+
+        response = requests.get(url=open_weather_url)
+
+        return JsonResponse(response.json())
+

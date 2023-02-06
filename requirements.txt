@@ -5,6 +5,7 @@ djangorestframework
 # Background proccess & cache
 celery
 redis
+django-redis
 
 # Third Party Packages
 djangorestframework-simplejwt
