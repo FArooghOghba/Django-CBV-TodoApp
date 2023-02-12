@@ -15,6 +15,8 @@ from todo.models import Task
 from .serializers import TaskModelSerializer
 from .permissions import IsTaskOwner
 
+from decouple import config
+
 
 class TaskModelViewSet(ModelViewSet):
     """
@@ -36,9 +38,9 @@ class TaskModelViewSet(ModelViewSet):
 class WeatherAPIView(APIView):
     @method_decorator(cache_page(60 * 20, key_prefix="weather-view"))
     def get(self, request):
-        city_name = 'Ahvaz'
-        api_key = 'a2fa7b56cab242ab3dbc85164885ca3b'
-        units = 'metric'
+        city_name = config('CITY_NAME')
+        api_key = config('OPEN_WEATHER_API_KEY')
+        units = config('UNITS')
         open_weather_url = f"https://api.openweathermap.org/data/2.5/weather?" \
                            f"q={city_name}&appid={api_key}&units={units}"
 

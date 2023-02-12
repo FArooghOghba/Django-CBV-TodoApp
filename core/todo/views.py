@@ -1,15 +1,11 @@
-from datetime import datetime
 import requests
 
 from django.core.cache import cache
 from django.shortcuts import redirect
-from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils.decorators import method_decorator
 
 from django.views import View
-from django.views.decorators.cache import cache_page
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -17,10 +13,12 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Task
 from .forms import TaskForm
 
+from decouple import config
 
-city_name = 'Ahvaz'
-api_key = 'a2fa7b56cab242ab3dbc85164885ca3b'
-units = 'metric'
+
+city_name = config('CITY_NAME')
+api_key = config('OPEN_WEATHER_API_KEY')
+units = config('UNITS')
 open_weather_url = f"https://api.openweathermap.org/data/2.5/weather?" \
                    f"q={city_name}&appid={api_key}&units={units}"
 
