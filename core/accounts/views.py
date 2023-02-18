@@ -214,7 +214,6 @@ class AccountsPasswordChangeDoneView(PasswordChangeDoneView):
 # Password Reset
 class AccountPasswordResetView(PasswordResetView):
     template_name = 'accounts/password-reset/password-reset.html'
-    from_email = 'sender@example.com'
     html_email_template_name = 'email/reset_password.html'
     email_template_name = 'email/reset_password.html'
     success_url = reverse_lazy('accounts:password_reset_done')
