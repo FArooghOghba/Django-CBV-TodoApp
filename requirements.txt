@@ -21,6 +21,7 @@ flake8
 black
 pytest
 pytest-django
+Faker
 
 # Production Modules
 psycopg2-binary
