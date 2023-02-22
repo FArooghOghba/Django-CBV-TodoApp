@@ -1,0 +1,76 @@
+
+services:
+  redis:
+    image: redis
+    container_name: redis_todoapp
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+
+  db_postgresql:
+    image: postgres
+    container_name: db_postgresql_todoapp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  backend:
+    build: .
+    container_name: backend_todoapp
+    command: gunicorn core.wsgi --bind 0.0.0.0:8000
+    volumes:
+      - ./core:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    expose:
+      - "8000"
+    env_file:
+      - ./core/.env
+    depends_on:
+      - redis
+
+  nginx:
+    image: nginx
+    container_name: nginx_todoapp
+    ports:
+      - "80:80"
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/home/app/staticfiles
+      - media_volume:/home/app/media
+    depends_on:
+      - redis
+      - backend
+
+  celery-worker:
+    build: .
+    container_name: celery_worker_todoapp
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - ./core:/app
+    env_file:
+      - ./core/.env
+    depends_on:
+      - redis
+      - backend
+
+  celery-beater:
+    build: .
+    container_name: celery_beater_todoapp
+    command: celery -A core beat -l info
+    volumes:
+      - ./core:/app
+    env_file:
+      - ./core/.env
+    depends_on:
+      - redis
+      - backend
+
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

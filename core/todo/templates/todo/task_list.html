@@ -4,7 +4,16 @@
 
     <div class="header-bar">
         <div>
-            <h1>Hello, {{ request.user }}</h1>
+
+            <div>
+                <h1 style="margin-bottom: 0;">Hello, {{ request.user }}</h1>
+                <div style="margin-bottom: 22px;">
+                    It's {{ weather_description }} day for working.
+                    temp is {{ temp }}
+                    <iconify-icon icon="tabler:temperature-celsius"></iconify-icon>
+                </div>
+            </div>
+
             <h3 style="margin:0">You have
                 &nbsp;<i>{{ incomplete_task_count }}</i>
                 &nbsp;incomplete task{{ incomplete_task_count | pluralize:"s" }}

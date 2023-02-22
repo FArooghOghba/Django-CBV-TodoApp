@@ -1,6 +1,8 @@
 from django.urls import path, include
-from .views import (TaskListView, TaskCreateView, TaskUpdateView,
-                    TaskDetailView, TaskDeleteView, TaskCompleteView)
+from .views import (
+    TaskListView, TaskCreateView, TaskUpdateView,
+    TaskDetailView, TaskDeleteView, TaskCompleteView,
+)
 
 
 app_name = 'task'

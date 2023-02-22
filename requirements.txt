@@ -2,6 +2,11 @@
 django >3.2,<3.3
 djangorestframework
 
+# Background proccess & cache
+celery
+redis
+django-redis
+
 # Third Party Packages
 djangorestframework-simplejwt
 drf-yasg[validation]
@@ -17,3 +22,7 @@ black
 pytest
 pytest-django
 Faker
+
+# Production Modules
+psycopg2-binary
+gunicorn

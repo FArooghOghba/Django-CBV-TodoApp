@@ -1,3 +1,6 @@
+import requests
+
+from django.core.cache import cache
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,8 +13,20 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Task
 from .forms import TaskForm
 
+from decouple import config
+
+
+city_name = config("CITY_NAME")
+api_key = config("OPEN_WEATHER_API_KEY")
+units = config("UNITS")
+open_weather_url = (
+    f"https://api.openweathermap.org/data/2.5/weather?"
+    f"q={city_name}&appid={api_key}&units={units}"
+)
+
 
 # Create your views here.
+
 
 class TaskListView(LoginRequiredMixin, ListView):
     """
@@ -19,18 +34,28 @@ class TaskListView(LoginRequiredMixin, ListView):
     """
 
     model = Task
-    context_object_name = 'tasks'
+    context_object_name = "tasks"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tasks'] = self.model.objects.filter(user=self.request.user)
-        task_count = context['tasks'].filter(complete=False).count()
-        context['incomplete_task_count'] = task_count
+        context["tasks"] = self.model.objects.filter(user=self.request.user)
+        task_count = context["tasks"].filter(complete=False).count()
+        context["incomplete_task_count"] = task_count
 
-        search = self.request.GET.get('search', '')
+        search = self.request.GET.get("search", "")
         if search:
-            context['tasks'] = context['tasks'].filter(title__icontains=search)
-        context['search'] = search
+            context["tasks"] = context["tasks"].filter(title__icontains=search)
+        context["search"] = search
+
+        # getting weather from openweather api
+        if cache.get("weather") is None:
+            response = requests.get(url=open_weather_url)
+            cache.set("weather", response.json(), 60 * 20)
+
+        context["weather_description"] = cache.get("weather")["weather"][0][
+            "description"
+        ]
+        context["temp"] = cache.get("weather")["main"]["temp"]
 
         return context
 
@@ -45,8 +70,8 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
     """
 
     model = Task
-    context_object_name = 'task'
-    pk_url_kwarg = 'task_id'
+    context_object_name = "task"
+    pk_url_kwarg = "task_id"
 
     def get_queryset(self):
         """
@@ -67,7 +92,7 @@ class TaskCreateView(LoginRequiredMixin, CreateView):
 
     model = Task
     form_class = TaskForm
-    success_url = reverse_lazy('task:list')
+    success_url = reverse_lazy("task:list")
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -82,8 +107,8 @@ class TaskUpdateView(LoginRequiredMixin, UpdateView):
 
     model = Task
     form_class = TaskForm
-    pk_url_kwarg = 'task_id'
-    success_url = reverse_lazy('task:list')
+    pk_url_kwarg = "task_id"
+    success_url = reverse_lazy("task:list")
 
     def get_queryset(self):
         """
@@ -103,9 +128,9 @@ class TaskDeleteView(LoginRequiredMixin, DeleteView):
     """
 
     model = Task
-    pk_url_kwarg = 'task_id'
-    context_object_name = 'task'
-    success_url = reverse_lazy('task:list')
+    pk_url_kwarg = "task_id"
+    context_object_name = "task"
+    success_url = reverse_lazy("task:list")
 
     def get_queryset(self):
         """
@@ -125,11 +150,11 @@ class TaskCompleteView(View):
     """
 
     model = Task
-    pk_url_kwarg = 'task_id'
-    success_url = reverse_lazy('task:list')
+    pk_url_kwarg = "task_id"
+    success_url = reverse_lazy("task:list")
 
     def get(self, request, *args, **kwargs):
-        task = Task.objects.get(id=kwargs.get('task_id'))
+        task = Task.objects.get(id=kwargs.get("task_id"))
 
         if task.complete:
             task.complete = False
@@ -137,4 +162,4 @@ class TaskCompleteView(View):
             task.complete = True
 
         task.save()
-        return redirect('task:list')
+        return redirect("task:list")
