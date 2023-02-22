@@ -23,12 +23,13 @@ class TaskModelViewSet(ModelViewSet):
     A simple ViewSet for viewing and editing the tasks
     associated with the user.
     """
+
     serializer_class = TaskModelSerializer
     permission_classes = [IsAuthenticated, IsTaskOwner]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['complete']
-    search_fields = ['title', 'descriptions']
-    ordering_fields = ['complete', 'created_date']
+    filterset_fields = ["complete"]
+    search_fields = ["title", "descriptions"]
+    ordering_fields = ["complete", "created_date"]
 
     def get_queryset(self):
         user_id = self.request.user.id
@@ -38,13 +39,14 @@ class TaskModelViewSet(ModelViewSet):
 class WeatherAPIView(APIView):
     @method_decorator(cache_page(60 * 20, key_prefix="weather-view"))
     def get(self, request):
-        city_name = config('CITY_NAME')
-        api_key = config('OPEN_WEATHER_API_KEY')
-        units = config('UNITS')
-        open_weather_url = f"https://api.openweathermap.org/data/2.5/weather?" \
-                           f"q={city_name}&appid={api_key}&units={units}"
+        city_name = config("CITY_NAME")
+        api_key = config("OPEN_WEATHER_API_KEY")
+        units = config("UNITS")
+        open_weather_url = (
+            f"https://api.openweathermap.org/data/2.5/weather?"
+            f"q={city_name}&appid={api_key}&units={units}"
+        )
 
         response = requests.get(url=open_weather_url)
 
         return JsonResponse(response.json())
-
