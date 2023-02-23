@@ -30,8 +30,8 @@ jobs:
       - name: Connect and Execute Commands
         uses: appleboy/ssh-action@master
         with:
-          username: ${{USERNAME}}
-          password: ${{PASSWORD}}
-          host: ${{HOST}}
-          port: ${{PORT}}
+          username: ${{secrets.USERNAME}}
+          password: ${{secrets.PASSWORD}}
+          host: ${{secrets.HOST}}
+          port: ${{secrets.PORT}}
           script: ls
