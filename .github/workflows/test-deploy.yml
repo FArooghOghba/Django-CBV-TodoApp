@@ -15,6 +15,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Build ENV
+      run: echo "${{ secrets.BACKEND_ENV }}" | base64 -d > .env
     - name: Setup Docker-Compose
       run: docker-compose -f docker-compose-stage.yml up -d
     - name: Run Tests
