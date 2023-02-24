@@ -10,7 +10,6 @@ jobs:
 
   Test:
     name: Test
-
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +26,6 @@ jobs:
     if: ${{ always() && contains(join(needs.*.result, ','), 'success') }}
     name: Deploy
     needs: Test
-
     runs-on: ubuntu-latest
 
     steps:
